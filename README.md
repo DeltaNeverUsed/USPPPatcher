@@ -46,6 +46,7 @@ public static class TextReplacePreProcessor {
 }
 ```
 
+For more examples have a look at the Project(s) below
 
 ## Projects using USPPPatcher
 - [USPPNet](https://github.com/DeltaNeverUsed/USPPNet)
