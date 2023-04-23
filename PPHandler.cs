@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using UnityEngine;
 using USPPPatcher.Helpers;
 
-namespace USPPPatcher.Editor
+namespace USPPPatcher
 {
     public class PPSubscriber
     {
@@ -25,7 +25,7 @@ namespace USPPPatcher.Editor
 
         public bool UsesAnalyzer;
     }
-
+    
     public class PPInfo
     {
         /// <summary>
@@ -33,7 +33,7 @@ namespace USPPPatcher.Editor
         /// </summary>
         public Analyzer Analyzer;
     }
-    
+
     public static class PPHandler
     {
         private static List<PPSubscriber> PreProcessors = new List<PPSubscriber>();
