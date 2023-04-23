@@ -11,11 +11,11 @@ Let's say you want to make a PreProcessor that replaces any text saying "Heya!" 
 We'll start off by creating a static class, let's call it TextReplacePreProcessor.
 Inside said class we'll want to create a Static Parse function, but you can name it whatever you want.
 
-The Parse function will take and return a string, that string is the source code of the U# program you want to parse.
+The Parse function will take a string, a PPInfo variable, and it'll return a string, that string is the source code of the U# program you want to parse.
 
 ```c#
 public static class TextReplacePreProcessor {
-    private static string Parse(string program)
+    private static string Parse(string program, PPInfo info)
     { 
         return program.Replace("\"Heya!\"", "\"Whaaa\"");
     }
@@ -32,7 +32,7 @@ You'd do this by creating another static function inside your class. \
 You'd probably want to use [InitializeOnLoadMethod] so that your subcribe function gets called whenever your script is loaded
 ```c#
 public static class TextReplacePreProcessor {
-    private static string Parse(string program)
+    private static string Parse(string program, PPInfo info)
     { 
         return program.Replace("\"Heya!\"", "\"Whaaa\"");
     }
@@ -45,6 +45,8 @@ public static class TextReplacePreProcessor {
     }
 }
 ```
+
+# TODO: write docs for the Analyzer
 
 For more examples have a look at the Project(s) below
 
