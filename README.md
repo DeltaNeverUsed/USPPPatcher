@@ -41,7 +41,6 @@ public static class TextReplacePreProcessor {
     [InitializeOnLoadMethod]
     private static void Subscribe()
     {
-        // Just import USPPPatcher.Editor if you don't want to have this be so long.
         PPHandler.Subscribe(Parse, 1, "Example Text Replacer");
     }
 }

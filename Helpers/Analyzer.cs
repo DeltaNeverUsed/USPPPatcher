@@ -37,6 +37,30 @@ namespace USPPPatcher.Helpers
                 GetVariables(func.Index, func, func.ParentSpace);
             }
         }
+        
+        public void OffsetEverything(int start, string original, string newString)
+        {
+            OffsetEverything(start, newString.Length - original.Length);
+        }
+        public void OffsetEverything(int start, int original, string newString)
+        {
+            OffsetEverything(start, newString.Length - original);
+        }
+        public void OffsetEverything(int start, int offset)
+        {
+            _funcs.ForEach(x => x.Index += x.Index >= start ? offset : 0);
+            _classes.ForEach(x => x.Index += x.Index >= start ? offset : 0);
+            _spaces.ForEach(x => x.Index += x.Index >= start ? offset : 0);
+
+            foreach (var v in _vars)
+            {
+                v.Index += v.Index >= start ? offset : 0;
+                for (var index = 0; index < v.Uses.Count; index++)
+                {
+                    v.Uses[index] += v.Uses[index] >= start ? offset : 0;
+                }
+            }
+        }
 
         /// <summary>
         /// Get space by index
@@ -62,6 +86,12 @@ namespace USPPPatcher.Helpers
             return valid2.Any() ? valid2.First() : null;
         }
 
+        /// <summary>
+        /// Gets a variable by name in a space and all parents spaces
+        /// </summary>
+        /// <param name="varName">Name of the variable</param>
+        /// <param name="varSpace">The space to start the search in</param>
+        /// <returns>The variable</returns>
         public Variable GetVariableInSpace(string varName, VarSpace varSpace)
         {
             var vars = _vars.Where(v => v.Name == varName && v.SpaceId == varSpace.SpaceId);
@@ -69,6 +99,48 @@ namespace USPPPatcher.Helpers
                 return vars.First();
             if (varSpace.ParentSpace != null)
                 return GetVariableInSpace(varName, varSpace.ParentSpace);
+            return null;
+        }
+        /// <summary>
+        /// Gets a variable by name in all spaces
+        /// </summary>
+        /// <param name="varName">Name of the variable</param>
+        /// <returns>The variable</returns>
+        public Variable GetVariableInSpace(string varName)
+        {
+            var vars = _vars.Where(v => v.Name == varName);
+            if (vars.Any())
+                return vars.First();
+            return null;
+        }
+        
+        /// <summary>
+        /// Gets a variable by regex type in a space and all parents spaces
+        /// </summary>
+        /// <param name="varType">regex thingy</param>
+        /// <param name="varSpace">The space to start the search in</param>
+        /// <returns>The variable</returns>
+        public Variable[] GetVariablesInSpaceByType(string varType, VarSpace varSpace)
+        {
+            var vars = _vars.Where(v => v.SpaceId == varSpace.SpaceId && Regex.IsMatch(v.Type, varType));
+            Variable[] temp = new Variable[] { };
+            var nn = varSpace.ParentSpace != null;
+            if (nn)
+                temp = GetVariablesInSpaceByType(varType, varSpace.ParentSpace);
+            if (vars.Any())
+                return nn ? vars.ToArray().Concat(temp).ToArray() : vars.ToArray();
+            return null;
+        }
+        /// <summary>
+        /// Gets a variable by regex type in all spaces
+        /// </summary>
+        /// <param name="varType">regex thingy</param>
+        /// <returns>The variable</returns>
+        public Variable[] GetVariablesInSpaceByType(string varType)
+        {
+            var vars = _vars.Where(v => Regex.IsMatch(v.Type, varType));
+            if (vars.Any())
+                return vars.ToArray();
             return null;
         }
 
@@ -146,13 +218,14 @@ namespace USPPPatcher.Helpers
 
         private void GetClasses()
         {
-            var classes = Regex.Matches(_program, "class\\s+(?:[A-Z]\\w+)+");
+            var classes = Regex.Matches(_program, "class\\s(?:[\\w\\d]\\w+)+");
 
             foreach (Match Class in classes)
             {
+                
                 var c = new Class
                 {
-                    Name = _program.Substring(Class.Index, _program.IndexOf(' ', Class.Index) - Class.Index),
+                    Name = Class.Value.Substring(6),
                     Index = Class.Index,
                     SpaceId = _rand.Next(),
                     ParentSpace = null
@@ -174,7 +247,7 @@ namespace USPPPatcher.Helpers
         {
             var curr = GetSubStrInsideCBrack(ref index, out _);
 
-            var re = @"\b((public|private|protected|internal)\s+)+(static\s+)?([A-Za-z0-9]+\s)([A-Za-z0-9]+)\([A-Za-z0-9,\s]*\)?";
+            var re = @"\b((public|private|protected|internal)\s+)?(static\s+)?([A-Za-z0-9]+\s)([A-Za-z0-9]+)\([A-Za-z0-9,\s]*\)?(?=\s*\{)";
 
             var matches = Regex.Matches(curr, re);
             
@@ -216,6 +289,7 @@ namespace USPPPatcher.Helpers
         {
             var curr = GetSubStrInsideCBrack(ref index, out _);
             curr = curr.Substring(1, curr.Length - 2);
+            var currOG = curr;
             index++;
             
             var re = @"\{(?:[^{}]*(?:\{(?<Depth>)|\}(?<-Depth>))*(?(Depth)(?!)))?\}";
@@ -225,7 +299,7 @@ namespace USPPPatcher.Helpers
                 curr = curr.Remove(m.Index+1, m.Length-2).Insert(m.Index+1, "".PadRight(m.Length-2));
             }
             
-            re = @"\b(?<type>\w+)\s+(?<name>\w+)\s*(?<assignment>=\s*.+)?\s*;";
+            re = @"\b(?<type>[\w<>]+)\s+(?<name>\w+)\s*(?<assignment>=\s*.+)?\s*;";
             matches = Regex.Matches(curr, re);
             foreach (Match m in matches)
             {
@@ -235,7 +309,7 @@ namespace USPPPatcher.Helpers
                 
                 if (variableType == "return" || string.IsNullOrWhiteSpace(variableAssignment))
                     continue;
-                
+
                 if (variableAssignment.StartsWith("new "))
                 {
                     variableType = variableAssignment.Substring(4, variableAssignment.IndexOf('(') - 4);
@@ -250,17 +324,24 @@ namespace USPPPatcher.Helpers
                     
                     variableType = _funcs[func].ReturnType;
                 }
-
                 var variable = new Variable
                 {
                     Name = variableName,
                     Type = variableType,
                     
+                    Index = m.Index + index,
+                    
                     SpaceId = space.SpaceId,
                     ParentSpace = parentSpace
                 };
 
-                //Debug.Log(variableType + ", " + variableName + "OG: " + m.Value);
+                var mas = Regex.Matches(currOG, "\\b(list+)");
+                foreach (Match m2 in mas)
+                {
+                    variable.Uses.Add(index + m2.Index);
+                }
+
+                _vars.Add(variable);
             }
         }
 
@@ -269,6 +350,7 @@ namespace USPPPatcher.Helpers
     public class Variable : Node
     {
         public string Type;
+        public List<int> Uses = new List<int>();
     }
     
     public class Function : Node

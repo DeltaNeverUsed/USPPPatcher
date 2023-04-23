@@ -38,6 +38,8 @@ namespace USPPPatcher
     {
         private static List<PPSubscriber> PreProcessors = new List<PPSubscriber>();
 
+        public static bool UseAnalyzer;
+
         /// <summary>
         /// Subscribes your PreProcessor to the patcher.
         /// </summary>
@@ -64,7 +66,7 @@ namespace USPPPatcher
                 return null;
             }
 
-            Patcher.UseAnalyzer |= usesAnalyzer;
+            UseAnalyzer |= usesAnalyzer;
             
             var subscriber = new PPSubscriber
             {
@@ -82,7 +84,7 @@ namespace USPPPatcher
             return subscriber;
         }
 
-        public static string Parse(string program, ref Analyzer analyzer)
+        public static string Parse(string program, Analyzer analyzer)
         {
             // Loop through every PreProcessor and call their Parse function
             foreach (var PPs in PreProcessors)

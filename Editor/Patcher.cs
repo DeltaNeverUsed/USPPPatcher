@@ -9,8 +9,6 @@ namespace USPPPatcher.Editor
     [InitializeOnLoad]
     public static class Patcher
     {
-        public static bool UseAnalyzer;
-        
         public static void Postfix(string filePath, float timeoutSeconds, ref string __result)
         {
             if (__result == "")
@@ -20,13 +18,13 @@ namespace USPPPatcher.Editor
             __result = __result.Replace("\r\n", "\n").Replace('\r', '\n');
 
             var analyzer = new Analyzer();
-            if (UseAnalyzer)
+            if (true)
             {
                 analyzer.Analyze(__result);
             }
 
             // Do PreProcessor stuff
-            __result = PPHandler.Parse(__result, ref analyzer);
+            __result = PPHandler.Parse(__result, analyzer);
         }
 
         static Patcher() {
