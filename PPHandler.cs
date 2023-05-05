@@ -28,10 +28,6 @@ namespace USPPPatcher
     
     public class PPInfo
     {
-        /// <summary>
-        /// the provided Analyze variable
-        /// </summary>
-        public Analyzer Analyzer;
     }
 
     public static class PPHandler
@@ -84,7 +80,7 @@ namespace USPPPatcher
             return subscriber;
         }
 
-        public static string Parse(string program, Analyzer analyzer)
+        public static string Parse(string program)
         {
             // Loop through every PreProcessor and call their Parse function
             foreach (var PPs in PreProcessors)
@@ -94,7 +90,7 @@ namespace USPPPatcher
                 {
                     var info = new PPInfo
                     {
-                        Analyzer = analyzer
+                        
                     };
                     
                     var tempProg = PPs.Func(program, info);

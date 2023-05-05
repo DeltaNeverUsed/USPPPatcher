@@ -17,14 +17,8 @@ namespace USPPPatcher.Editor
             // Normalize new lines
             __result = __result.Replace("\r\n", "\n").Replace('\r', '\n');
 
-            var analyzer = new Analyzer();
-            if (true)
-            {
-                analyzer.Analyze(__result);
-            }
-
             // Do PreProcessor stuff
-            __result = PPHandler.Parse(__result, analyzer);
+            __result = PPHandler.Parse(__result);
         }
 
         static Patcher() {
