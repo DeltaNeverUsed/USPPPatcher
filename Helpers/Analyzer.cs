@@ -5,8 +5,57 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = System.Random;
 
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using USPPPatcher.Editor;
+
 namespace USPPPatcher.Helpers
 {
+    internal class SyntaxWalker : CSharpSyntaxWalker
+    {
+        private readonly SemanticModel _semanticModel;
+
+        public SyntaxWalker(SemanticModel semanticModel)
+        {
+            _semanticModel = semanticModel;
+        }
+
+        public override void VisitVariableDeclaration(VariableDeclarationSyntax node)
+        {
+            // Get the syntax node's location
+            FileLinePositionSpan lineSpan = _semanticModel.SyntaxTree.GetLineSpan(node.Span);
+        
+            // Get the start and end positions
+            int startLine = lineSpan.StartLinePosition.Line + 1;
+            int startColumn = lineSpan.StartLinePosition.Character + 1;
+            int endLine = lineSpan.EndLinePosition.Line + 1;
+            int endColumn = lineSpan.EndLinePosition.Character + 1;
+
+            // Output the position information
+            Console.WriteLine($"Method: {node.Variables.First().Identifier.Text} at {startLine}:{startColumn} - {endLine}:{endColumn}");
+            
+            base.VisitVariableDeclaration(node);
+        }
+
+        public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
+        {
+            // Get the syntax node's location
+            FileLinePositionSpan lineSpan = _semanticModel.SyntaxTree.GetLineSpan(node.Span);
+        
+            // Get the start and end positions
+            int startLine = lineSpan.StartLinePosition.Line + 1;
+            int startColumn = lineSpan.StartLinePosition.Character + 1;
+            int endLine = lineSpan.EndLinePosition.Line + 1;
+            int endColumn = lineSpan.EndLinePosition.Character + 1;
+
+            // Output the position information
+            Console.WriteLine($"Method: {node.Identifier.Text} at {startLine}:{startColumn} - {endLine}:{endColumn}");
+
+            base.VisitMethodDeclaration(node);
+        }
+    }
+    
     public class Analyzer
     {
         private List<Variable> _vars = new List<Variable>();
@@ -18,24 +67,31 @@ namespace USPPPatcher.Helpers
         private string _program;
         
         private Random _rand = new Random();
+        
+        private static string[] GetProjectDefines()
+        {
+            List<string> defines = new List<string>();
+
+            foreach (string define in Patcher.eubs)
+            {
+                if (define.StartsWith("UNITY_EDITOR"))
+                    continue;
+
+                defines.Add(define);
+            }
+
+            defines.Add("COMPILER_UDONSHARP");
+
+            return defines.ToArray();
+        }
 
         public void Analyze(string program)
         {
             _program = program;
-            RemoveComments();
 
-            GetClasses();
+            var programSyntaxTree = CSharpSyntaxTree.ParseText(_program, CSharpParseOptions.Default.WithDocumentationMode(DocumentationMode.None).WithPreprocessorSymbols(GetProjectDefines()).WithLanguageVersion(LanguageVersion.CSharp7_3));
 
-            foreach (var c in _classes)
-            {
-                GetFunctions(c.Index, c);
-                GetVariables(c.Index, c, c.ParentSpace);
-            }
-
-            foreach (var func in _funcs)
-            {
-                GetVariables(func.Index, func, func.ParentSpace);
-            }
+            var sw = new SyntaxWalker(programSyntaxTree.);
         }
         
         public void OffsetEverything(int start, string original, string newString)
