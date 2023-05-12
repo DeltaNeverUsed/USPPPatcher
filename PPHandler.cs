@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using UnityEngine;
-using USPPPatcher.Helpers;
 
 namespace USPPPatcher
 {
@@ -22,8 +20,6 @@ namespace USPPPatcher
         /// The Function to call to hand the program off the to PreProcessor.
         /// </summary>
         public Func<string, PPInfo, string> Func;
-
-        public bool UsesAnalyzer;
     }
     
     public class PPInfo
@@ -33,9 +29,7 @@ namespace USPPPatcher
     public static class PPHandler
     {
         private static List<PPSubscriber> PreProcessors = new List<PPSubscriber>();
-
-        public static bool UseAnalyzer;
-
+        
         /// <summary>
         /// Subscribes your PreProcessor to the patcher.
         /// </summary>
@@ -43,7 +37,7 @@ namespace USPPPatcher
         /// <param name="priority">Determines which PreProcessor will run before others. (Higher is earlier)</param>
         /// <param name="name">The Name of your PreProcessor.</param>
         /// <param name="usesAnalyzer">Enables or disables the use of the built in Analyzer</param>
-        public static PPSubscriber Subscribe(Func<string, PPInfo, string> func, int priority = 1, string name = "", bool usesAnalyzer = false)
+        public static PPSubscriber Subscribe(Func<string, PPInfo, string> func, int priority = 1, string name = "")
         {
             // I don't like doing these checks
             if (func == null)
@@ -61,15 +55,12 @@ namespace USPPPatcher
                 Debug.LogError($"PreProcessor: {name} was already subscribed");
                 return null;
             }
-
-            UseAnalyzer |= usesAnalyzer;
             
             var subscriber = new PPSubscriber
             {
                 Name = name,
                 Priority = priority,
                 Func = func,
-                UsesAnalyzer = usesAnalyzer
             };
             
             PreProcessors.Add(subscriber);
@@ -104,8 +95,7 @@ namespace USPPPatcher
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"PreProcessor: {PPs.Name} Produced error: "+e);
-                    throw;
+                    Debug.LogError($"<color=#FF0000>PreProcessor</color>: {PPs.Name} Produced error: "+e);
                 }
             }
 

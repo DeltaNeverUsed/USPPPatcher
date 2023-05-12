@@ -1,8 +1,6 @@
 ﻿using HarmonyLib;
 using UdonSharp.Compiler;
 using UnityEditor;
-using UnityEngine;
-using USPPPatcher.Helpers;
 
 namespace USPPPatcher.Editor
 {

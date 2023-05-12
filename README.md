@@ -1,4 +1,4 @@
-﻿# Delta's UdonSharp PreProcessor Framework
+# Delta's UdonSharp PreProcessor Framework
 
 ## Installation
 Clone the repository into your project's Assets folder
@@ -45,8 +45,6 @@ public static class TextReplacePreProcessor {
     }
 }
 ```
-
-# TODO: write docs for the Analyzer
 
 For more examples have a look at the Project(s) below
 
