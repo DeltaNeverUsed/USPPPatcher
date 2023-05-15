@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿#if UNITY_EDITOR && !COMPILER_UDONSHARP
+using HarmonyLib;
 using UdonSharp.Compiler;
 using UnityEditor;
 
@@ -28,3 +29,4 @@ namespace USPPPatcher.Editor
         }
     }
 }
+#endif

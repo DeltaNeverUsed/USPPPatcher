@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR && !COMPILER_UDONSHARP
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -103,3 +104,4 @@ namespace USPPPatcher
         }
     }
 }
+#endif
