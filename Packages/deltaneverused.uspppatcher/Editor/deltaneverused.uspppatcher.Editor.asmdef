@@ -1,6 +1,11 @@
 {
-    "name": "USPPPatcher",
+    "name": "deltaneverused.uspppatcher.Editor",
+    "rootNamespace": "",
     "references": [
+        "VRC.SDK3",
+        "VRC.SDK3.Editor",
+        "VRC.SDKBase",
+        "VRC.SDKBase.Editor",
         "UdonSharp.Editor"
     ],
     "includePlatforms": [],
