@@ -1,12 +1,12 @@
 {
   "name": "deltaneverused.uspppatcher",
   "displayName": "USPPPatcher",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Patches the U# compiler to allow for extensions",
   "dependencies": {},
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.vrchat.worlds": "3.5.0^"
+    "com.vrchat.worlds": "^3.5.x"
   },
   "author": {
     "name": "DeltaNeverUsed",
