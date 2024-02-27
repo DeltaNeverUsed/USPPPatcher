@@ -1,12 +1,12 @@
 {
   "name": "deltaneverused.uspppatcher",
-  "displayName": "deltaneverused.uspppatcher",
-  "version": "0.0.1",
-  "description": "Describe this Package",
+  "displayName": "USPPPatcher",
+  "version": "0.0.2",
+  "description": "Patches the U# compiler to allow for extensions",
   "dependencies": {},
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.vrchat.worlds": "3.5.0"
+    "com.vrchat.worlds": "3.5.0^"
   },
   "author": {
     "name": "DeltaNeverUsed",
@@ -14,5 +14,4 @@
   },
   "legacyFolders": {},
   "legacyFiles": {},
-  "localPath": "D:\\GiteaRepos\\Unity\\Listings\\USPPPatcher\\Packages\\deltaneverused.uspppatcher"
 }
